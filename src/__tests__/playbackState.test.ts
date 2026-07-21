@@ -4,6 +4,7 @@ import {
   createPlaybackErrorAction,
   initialPlaybackState,
   reducePlaybackState,
+  shouldHandleAsyncResult,
 } from '../playbackState';
 
 describe('playback state', () => {
@@ -132,6 +133,51 @@ describe('playback state', () => {
     });
 
     expect(pressed.command).toBeNull();
+  });
+
+  test('toggles play and pause commands while preserving cover state', () => {
+    const imageReady = reducePlaybackState(initialPlaybackState, {
+      type: 'imageReady',
+      version: 0,
+    });
+    const ready = reducePlaybackState(imageReady, {
+      type: 'videoReady',
+      version: 0,
+    });
+    const playing = reducePlaybackState(ready, {
+      type: 'playing',
+      version: 0,
+    });
+    const pause = reducePlaybackState(playing, { type: 'press' });
+
+    expect(pause).toMatchObject({
+      status: 'paused',
+      command: 'pause',
+      showCover: false,
+    });
+
+    const resume = reducePlaybackState(pause, { type: 'press' });
+    expect(resume).toMatchObject({
+      status: 'paused',
+      command: 'play',
+      showCover: false,
+    });
+
+    const ended = reducePlaybackState(resume, {
+      type: 'ended',
+      version: 0,
+    });
+    const replay = reducePlaybackState(ended, { type: 'press' });
+    expect(replay).toMatchObject({
+      status: 'ended',
+      command: 'play',
+      showCover: true,
+    });
+  });
+
+  test('ignores async results after unmount', () => {
+    expect(shouldHandleAsyncResult(false)).toBe(false);
+    expect(shouldHandleAsyncResult(true)).toBe(true);
   });
 
   test('does not auto play after a resource load error', () => {

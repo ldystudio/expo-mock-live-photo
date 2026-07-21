@@ -14,6 +14,7 @@ import {
   initialPlaybackState,
   type PlaybackAction,
   reducePlaybackState,
+  shouldHandleAsyncResult,
 } from './playbackState';
 
 /** Displays an image-backed video that behaves like a Live Photo. */
@@ -29,6 +30,7 @@ export function MockLivePhoto({
   ...viewProps
 }: MockLivePhotoProps) {
   const nativeRef = useRef<MockLivePhotoNativeViewRef>(null);
+  const mountedRef = useRef(true);
   const stateRef = useRef(initialPlaybackState);
   const callbacksRef = useRef({
     onLoad,
@@ -57,9 +59,17 @@ export function MockLivePhoto({
     }
     if (next.command) {
       void nativeRef.current?.[next.command]().catch((cause: unknown) => {
+        if (!shouldHandleAsyncResult(mountedRef.current)) return;
         transition(createPlaybackErrorAction(cause, next.version));
       });
     }
+  }, []);
+
+  useLayoutEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
   }, []);
 
   useLayoutEffect(() => {
@@ -74,6 +84,7 @@ export function MockLivePhoto({
     transition({ type: 'reset' });
     const resetVersion = stateRef.current.version;
     void nativeRef.current?.reset().catch((cause: unknown) => {
+      if (!shouldHandleAsyncResult(mountedRef.current)) return;
       transition(createPlaybackErrorAction(cause, resetVersion));
     });
   }, [sourceKey, transition, videoSource.uri]);

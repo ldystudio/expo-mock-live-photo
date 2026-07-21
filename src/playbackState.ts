@@ -137,3 +137,7 @@ export function createPlaybackErrorAction(
     },
   };
 }
+
+export function shouldHandleAsyncResult(mounted: boolean): boolean {
+  return mounted;
+}
