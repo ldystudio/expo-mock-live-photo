@@ -36,7 +36,7 @@ export function Photo() {
 }
 ```
 
-Each component instance automatically plays once after both resources are ready. The cover image returns when the video ends naturally; after that, press anywhere on the component to play or pause.
+Each source pair automatically plays once after both resources are ready. Changing `source` or `videoSource` on the same component creates a new pair that automatically plays once. The cover image returns when the video ends naturally; after that, press anywhere on the component to play or pause.
 
 ## Props
 
