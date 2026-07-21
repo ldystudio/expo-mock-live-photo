@@ -16,6 +16,11 @@ config.resolver.blockList = [
   new RegExp(
     path.resolve('..', 'node_modules', 'react-native').replace(/\\/g, '\\\\'),
   ),
+  new RegExp(
+    path
+      .resolve('..', 'node_modules', 'expo-modules-core')
+      .replace(/\\/g, '\\\\'),
+  ),
 ];
 
 config.resolver.nodeModulesPaths = [

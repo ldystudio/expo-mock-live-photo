@@ -1,0 +1,81 @@
+# expo-mock-live-photo
+
+A React Native component that pairs a cover image with press-to-play video playback.
+
+## Requirements
+
+- React Native 0.75.5 or newer
+- Expo Modules in an Expo development build or a bare React Native app
+- iOS 16.4 or newer
+- Android API 24 or newer
+
+Expo Go does not include this native module. Use a development build.
+
+## Installation
+
+```bash
+bun add expo-mock-live-photo
+```
+
+Bare React Native apps must first [install and configure Expo Modules](https://docs.expo.dev/bare/installing-expo-modules/). On iOS, install pods after adding the package.
+
+## Usage
+
+```tsx
+import { MockLivePhoto } from 'expo-mock-live-photo';
+
+export function Photo() {
+  return (
+    <MockLivePhoto
+      source={require('./cover.jpg')}
+      videoSource={{ uri: 'https://example.com/video.mp4' }}
+      style={{ width: 320, height: 320 }}
+      onError={(error) => console.warn(error.code, error.message)}
+    />
+  );
+}
+```
+
+Press the component to start playback. The cover image is shown before playback and after the video ends.
+
+## Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `source` | `ImageSourcePropType` | Required | Cover image displayed before and after playback. |
+| `videoSource` | `{ uri: string }` | Required | URI readable by the platform video player. |
+| `muted` | `boolean` | `true` | Whether video audio is muted. |
+| `resizeMode` | `'cover' \| 'contain'` | `'cover'` | How the image and video fit their bounds. |
+| `onLoad` | `() => void` | - | Called once both resources are ready for each source pair. |
+| `onPlaybackStart` | `() => void` | - | Called whenever the video actually enters the playing state. |
+| `onPlaybackEnd` | `() => void` | - | Called when the video reaches its natural end. |
+| `onError` | `(error: { code: string; message: string }) => void` | - | Called once per error code for each source pair. Errors are also reported with `console.error`; they are not thrown. |
+| React Native `ViewProps` | `ViewProps` | - | Standard view props, including `style`, accessibility, and test props. |
+
+On iOS the component uses `AVPlayer`; on Android it uses `MediaPlayer`. It simulates the playback interaction and does not create or save platform Live Photo assets.
+
+## Example
+
+The example uses Expo SDK 52 and requires a development build:
+
+```bash
+cd example
+bun install
+bun expo prebuild
+bun expo run:ios
+# or: bun expo run:android
+```
+
+## Development
+
+```bash
+bun install
+bun test
+bun run typecheck
+bun run check
+bun run build
+```
+
+## License
+
+[MIT](LICENSE)

@@ -100,7 +100,7 @@ export function MockLivePhoto({
       onPress={() => transition({ type: 'press' })}
     >
       <MockLivePhotoNativeView
-        key={version}
+        key={`native-${version}`}
         ref={nativeRef}
         style={StyleSheet.absoluteFillObject}
         videoUri={videoSource.uri}
@@ -129,7 +129,7 @@ export function MockLivePhoto({
         onError={({ nativeEvent }) => reportError(nativeEvent)}
       />
       <Image
-        key={version}
+        key={`image-${version}`}
         source={source}
         resizeMode={resizeMode}
         style={[
