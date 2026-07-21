@@ -4,6 +4,13 @@
   "description": "Simulate Live Photo playback from an image and a video",
   "main": "build/index.js",
   "types": "build/index.d.ts",
+  "files": [
+    "android",
+    "build",
+    "ios",
+    "src",
+    "expo-module.config.json"
+  ],
   "scripts": {
     "build": "expo-module build",
     "check": "biome check .",
