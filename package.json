@@ -13,7 +13,6 @@
     "ios/ExpoMockLivePhotoModule.swift",
     "ios/ExpoMockLivePhotoView.swift",
     "ios/PlaybackState.swift",
-    "src",
     "expo-module.config.json"
   ],
   "scripts": {
