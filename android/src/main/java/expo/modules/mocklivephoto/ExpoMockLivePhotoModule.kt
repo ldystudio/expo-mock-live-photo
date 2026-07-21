@@ -8,7 +8,7 @@ class ExpoMockLivePhotoModule : Module() {
     Name("ExpoMockLivePhoto")
 
     View(ExpoMockLivePhotoView::class) {
-      Events("onVideoReady", "onPlaybackStart", "onPlaybackEnd", "onError")
+      Events("onVideoReady", "onPlaybackStart", "onPlaybackPause", "onPlaybackEnd", "onError")
 
       Prop("videoUri") { view: ExpoMockLivePhotoView, value: String -> view.setVideoUri(value) }
       Prop("muted") { view: ExpoMockLivePhotoView, value: Boolean -> view.setMuted(value) }

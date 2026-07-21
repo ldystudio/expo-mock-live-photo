@@ -17,6 +17,7 @@ class ExpoMockLivePhotoView(context: Context, appContext: AppContext) : ExpoView
   TextureView.SurfaceTextureListener {
   private val onVideoReady by EventDispatcher()
   private val onPlaybackStart by EventDispatcher()
+  private val onPlaybackPause by EventDispatcher()
   private val onPlaybackEnd by EventDispatcher()
   private val onError by EventDispatcher()
 
@@ -91,7 +92,7 @@ class ExpoMockLivePhotoView(context: Context, appContext: AppContext) : ExpoView
 
   override fun onWindowVisibilityChanged(visibility: Int) {
     super.onWindowVisibilityChanged(visibility)
-    if (visibility != View.VISIBLE) pause()
+    if (visibility != View.VISIBLE) pauseForLifecycle()
   }
 
   override fun onAttachedToWindow() {
@@ -103,7 +104,7 @@ class ExpoMockLivePhotoView(context: Context, appContext: AppContext) : ExpoView
   }
 
   override fun onDetachedFromWindow() {
-    pauseForDetach()
+    pauseForLifecycle()
     state.reduce(PlaybackState.Event.Detach)
     playbackStartPending = false
     releasePlayer(reportError = false)
@@ -128,7 +129,7 @@ class ExpoMockLivePhotoView(context: Context, appContext: AppContext) : ExpoView
   }
 
   override fun onSurfaceTextureDestroyed(texture: SurfaceTexture): Boolean {
-    pauseForDetach()
+    pauseForLifecycle()
     state.reduce(PlaybackState.Event.Detach)
     playbackStartPending = false
     releasePlayer(reportError = false)
@@ -228,12 +229,18 @@ class ExpoMockLivePhotoView(context: Context, appContext: AppContext) : ExpoView
     onError(mapOf("code" to code, "message" to message))
   }
 
-  private fun pauseForDetach() {
-    if (state.phase != PlaybackPhase.Playing) return
+  private fun pauseForLifecycle() {
+    val wasPlaying = state.phase == PlaybackPhase.Playing
+    playbackStartPending = false
+    state.reduce(PlaybackState.Event.Pause)
+    if (!wasPlaying) return
     try {
       player?.pause()
-    } catch (_: IllegalStateException) {
-    } catch (_: SecurityException) {
+      onPlaybackPause(emptyMap())
+    } catch (error: IllegalStateException) {
+      fail("PLAYBACK_ERROR", error.message ?: "Unable to pause video", state.version)
+    } catch (error: SecurityException) {
+      fail("PLAYBACK_ERROR", error.message ?: "Unable to pause video", state.version)
     }
   }
 

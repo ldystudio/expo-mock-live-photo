@@ -116,6 +116,7 @@ export function MockLivePhoto({
           transition({ type: 'playing', version });
           callbacksRef.current.onPlaybackStart?.();
         }}
+        onPlaybackPause={() => transition({ type: 'nativePaused', version })}
         onPlaybackEnd={() => {
           if (
             stateRef.current.version !== version ||

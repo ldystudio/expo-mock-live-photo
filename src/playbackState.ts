@@ -23,6 +23,7 @@ export type PlaybackAction =
   | ({ type: 'imageReady' } & VersionedAction)
   | ({ type: 'videoReady' } & VersionedAction)
   | ({ type: 'playing' } & VersionedAction)
+  | ({ type: 'nativePaused' } & VersionedAction)
   | ({ type: 'ended' } & VersionedAction)
   | ({ type: 'error'; error: MockLivePhotoError } & VersionedAction)
   | { type: 'paused' }
@@ -82,6 +83,11 @@ export function reducePlaybackState(
     }
     case 'playing':
       return { ...next, status: 'playing', showCover: false };
+    case 'nativePaused':
+      if (state.status === 'playing' || state.status === 'ready') {
+        return { ...next, status: 'paused', showCover: false };
+      }
+      return next;
     case 'paused':
       return { ...next, status: 'paused' };
     case 'ended':

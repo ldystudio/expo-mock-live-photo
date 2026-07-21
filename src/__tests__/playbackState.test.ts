@@ -174,6 +174,40 @@ describe('playback state', () => {
     });
   });
 
+  test('resumes directly after native lifecycle pause', () => {
+    const imageReady = reducePlaybackState(initialPlaybackState, {
+      type: 'imageReady',
+      version: 0,
+    });
+    const ready = reducePlaybackState(imageReady, {
+      type: 'videoReady',
+      version: 0,
+    });
+    const playing = reducePlaybackState(ready, {
+      type: 'playing',
+      version: 0,
+    });
+    expect(
+      reducePlaybackState(playing, { type: 'nativePaused', version: -1 })
+        .status,
+    ).toBe('playing');
+    expect(
+      reducePlaybackState(ready, { type: 'nativePaused', version: 0 }),
+    ).toMatchObject({ status: 'paused', showCover: false, command: null });
+
+    const paused = reducePlaybackState(playing, {
+      type: 'nativePaused',
+      version: 0,
+    });
+
+    expect(paused).toMatchObject({
+      status: 'paused',
+      showCover: false,
+      command: null,
+    });
+    expect(reducePlaybackState(paused, { type: 'press' }).command).toBe('play');
+  });
+
   test('does not auto play after a resource load error', () => {
     const failed = reducePlaybackState(initialPlaybackState, {
       type: 'error',

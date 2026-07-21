@@ -18,6 +18,7 @@ export type MockLivePhotoNativeViewProps = ViewProps &
     resizeMode: 'cover' | 'contain';
     onVideoReady: (event: EmptyEvent) => void;
     onPlaybackStart: (event: EmptyEvent) => void;
+    onPlaybackPause: (event: EmptyEvent) => void;
     onPlaybackEnd: (event: EmptyEvent) => void;
     onError: (event: ErrorEvent) => void;
   };
