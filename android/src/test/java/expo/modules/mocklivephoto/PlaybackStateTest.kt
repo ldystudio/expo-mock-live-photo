@@ -1,8 +1,6 @@
 package expo.modules.mocklivephoto
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -22,9 +20,8 @@ class PlaybackStateTest {
   @Test
   fun endedReplayConsumesItsToken() {
     val state = endedState()
-    val token = state.requestReplay(0)
-    assertNotNull(token)
-    assertTrue(state.consumeReplay(0, token!!))
+    assertTrue(state.requestReplay(0) is ReplayAction.Seek)
+    assertEquals(ReplayAction.Start(0), state.completeReplaySeek())
     state.reduce(PlaybackState.Event.Started(0))
     assertEquals(PlaybackPhase.Playing, state.phase)
   }
@@ -32,13 +29,24 @@ class PlaybackStateTest {
   @Test
   fun pauseAndResetCancelOldReplayTokens() {
     val state = endedState()
-    val pausedToken = state.requestReplay(0)!!
+    state.requestReplay(0)
     state.reduce(PlaybackState.Event.Pause)
-    assertFalse(state.consumeReplay(0, pausedToken))
+    assertEquals(null, state.completeReplaySeek())
 
-    val resetToken = state.requestReplay(0)!!
+    assertTrue(state.requestReplay(0) is ReplayAction.Seek)
     state.reduce(PlaybackState.Event.Reset)
-    assertFalse(state.consumeReplay(0, resetToken))
+    assertEquals(null, state.completeReplaySeek())
+  }
+
+  @Test
+  fun canceledInFlightSeekAdvancesLatestReplayWithoutStartingEarly() {
+    val state = endedState()
+    assertTrue(state.requestReplay(0) is ReplayAction.Seek)
+    state.reduce(PlaybackState.Event.Pause)
+
+    assertEquals(null, state.requestReplay(0))
+    assertEquals(ReplayAction.Seek(0), state.completeReplaySeek())
+    assertEquals(ReplayAction.Start(0), state.completeReplaySeek())
   }
 
   @Test

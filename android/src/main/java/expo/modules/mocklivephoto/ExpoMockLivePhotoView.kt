@@ -12,7 +12,6 @@ import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.viewevent.EventDispatcher
 import expo.modules.kotlin.views.ExpoView
 import java.io.IOException
-import java.util.ArrayDeque
 
 class ExpoMockLivePhotoView(context: Context, appContext: AppContext) : ExpoView(context, appContext),
   TextureView.SurfaceTextureListener {
@@ -23,7 +22,6 @@ class ExpoMockLivePhotoView(context: Context, appContext: AppContext) : ExpoView
 
   private val textureView = TextureView(context)
   private val state = PlaybackState()
-  private val pendingSeeks = ArrayDeque<ReplayRequest>()
   private var surface: Surface? = null
   private var player: MediaPlayer? = null
   private var videoUri: String? = null
@@ -61,25 +59,7 @@ class ExpoMockLivePhotoView(context: Context, appContext: AppContext) : ExpoView
 
     playbackStartPending = true
     if (state.phase == PlaybackPhase.Ended) {
-      val version = state.version
-      val token = state.requestReplay(version) ?: run {
-        playbackStartPending = false
-        return
-      }
-      val request = ReplayRequest(version, token)
-      pendingSeeks.addLast(request)
-      try {
-        currentPlayer.seekTo(0)
-      } catch (error: IllegalStateException) {
-        pendingSeeks.remove(request)
-        fail("PLAYBACK_ERROR", error.message ?: "Unable to restart video", version)
-      } catch (error: IllegalArgumentException) {
-        pendingSeeks.remove(request)
-        fail("PLAYBACK_ERROR", error.message ?: "Unable to restart video", version)
-      } catch (error: SecurityException) {
-        pendingSeeks.remove(request)
-        fail("PLAYBACK_ERROR", error.message ?: "Unable to restart video", version)
-      }
+      state.requestReplay(state.version)?.let { performReplayAction(currentPlayer, it) }
       return
     }
     startPlayer(currentPlayer, state.version)
@@ -102,7 +82,6 @@ class ExpoMockLivePhotoView(context: Context, appContext: AppContext) : ExpoView
   fun reset() {
     state.reduce(PlaybackState.Event.Reset)
     playbackStartPending = false
-    pendingSeeks.clear()
     videoUri = null
     videoWidth = 0
     videoHeight = 0
@@ -141,7 +120,6 @@ class ExpoMockLivePhotoView(context: Context, appContext: AppContext) : ExpoView
   override fun onSurfaceTextureDestroyed(texture: SurfaceTexture): Boolean {
     state.reduce(PlaybackState.Event.Reset)
     playbackStartPending = false
-    pendingSeeks.clear()
     releasePlayer(reportError = false)
     surface?.release()
     surface = null
@@ -184,10 +162,8 @@ class ExpoMockLivePhotoView(context: Context, appContext: AppContext) : ExpoView
         if (previous != PlaybackPhase.Ended && state.phase == PlaybackPhase.Ended) onPlaybackEnd(emptyMap())
       }
       newPlayer.setOnSeekCompleteListener { seekPlayer ->
-        val request = pendingSeeks.pollFirst() ?: return@setOnSeekCompleteListener
-        if (!isCurrent(seekPlayer, request.version) || !state.consumeReplay(request.version, request.token)) return@setOnSeekCompleteListener
-        if (!playbackStartPending) return@setOnSeekCompleteListener
-        startPlayer(seekPlayer, request.version)
+        if (seekPlayer !== player) return@setOnSeekCompleteListener
+        state.completeReplaySeek()?.let { performReplayAction(seekPlayer, it) }
       }
       newPlayer.setOnErrorListener { failedPlayer, _, _ ->
         if (!isCurrent(failedPlayer, version)) return@setOnErrorListener true
@@ -236,8 +212,24 @@ class ExpoMockLivePhotoView(context: Context, appContext: AppContext) : ExpoView
     state.reduce(PlaybackState.Event.Failed(version))
     if (previous == PlaybackPhase.Failed) return
     playbackStartPending = false
-    pendingSeeks.clear()
     onError(mapOf("code" to code, "message" to message))
+  }
+
+  private fun performReplayAction(currentPlayer: MediaPlayer, action: ReplayAction) {
+    when (action) {
+      is ReplayAction.Seek -> try {
+        currentPlayer.seekTo(0)
+      } catch (error: IllegalStateException) {
+        fail("PLAYBACK_ERROR", error.message ?: "Unable to restart video", action.version)
+      } catch (error: IllegalArgumentException) {
+        fail("PLAYBACK_ERROR", error.message ?: "Unable to restart video", action.version)
+      } catch (error: SecurityException) {
+        fail("PLAYBACK_ERROR", error.message ?: "Unable to restart video", action.version)
+      }
+      is ReplayAction.Start -> if (playbackStartPending && isCurrent(currentPlayer, action.version)) {
+        startPlayer(currentPlayer, action.version)
+      }
+    }
   }
 
   private fun releasePlayer(reportError: Boolean) {
@@ -292,6 +284,4 @@ class ExpoMockLivePhotoView(context: Context, appContext: AppContext) : ExpoView
     }
     textureView.setTransform(Matrix().apply { setScale(scaleX, scaleY, viewWidth / 2f, viewHeight / 2f) })
   }
-
-  private data class ReplayRequest(val version: Int, val token: Int)
 }
