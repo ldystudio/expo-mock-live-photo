@@ -10,6 +10,7 @@ import {
   type MockLivePhotoNativeViewRef,
 } from './MockLivePhotoNativeView';
 import {
+  createPlaybackErrorAction,
   initialPlaybackState,
   type PlaybackAction,
   reducePlaybackState,
@@ -56,7 +57,7 @@ export function MockLivePhoto({
     }
     if (next.command) {
       void nativeRef.current?.[next.command]().catch((cause: unknown) => {
-        reportCommandError(cause, next.version, transition);
+        transition(createPlaybackErrorAction(cause, next.version));
       });
     }
   }, []);
@@ -71,8 +72,9 @@ export function MockLivePhoto({
     }
     previousResources.current = { sourceKey, videoUri: videoSource.uri };
     transition({ type: 'reset' });
+    const resetVersion = stateRef.current.version;
     void nativeRef.current?.reset().catch((cause: unknown) => {
-      reportCommandError(cause, stateRef.current.version, transition);
+      transition(createPlaybackErrorAction(cause, resetVersion));
     });
   }, [sourceKey, transition, videoSource.uri]);
 
@@ -138,18 +140,3 @@ export function MockLivePhoto({
 const styles = StyleSheet.create({
   hidden: { opacity: 0 },
 });
-
-function reportCommandError(
-  cause: unknown,
-  version: number,
-  transition: (action: PlaybackAction) => void,
-) {
-  transition({
-    type: 'error',
-    version,
-    error: {
-      code: 'PLAYBACK_ERROR',
-      message: cause instanceof Error ? cause.message : String(cause),
-    },
-  });
-}

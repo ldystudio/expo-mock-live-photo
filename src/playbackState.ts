@@ -46,16 +46,16 @@ export function reducePlaybackState(
   state: PlaybackState,
   action: PlaybackAction,
 ): PlaybackState {
-  if ('version' in action && action.version !== state.version) {
-    return state;
-  }
-
   const next = {
     ...state,
     command: null,
     shouldNotifyLoad: false,
     errorToReport: null,
   };
+
+  if ('version' in action && action.version !== state.version) {
+    return next;
+  }
 
   switch (action.type) {
     case 'imageReady':
@@ -122,4 +122,18 @@ export function reducePlaybackState(
         version: state.version + 1,
       };
   }
+}
+
+export function createPlaybackErrorAction(
+  cause: unknown,
+  version: number,
+): PlaybackAction {
+  return {
+    type: 'error',
+    version,
+    error: {
+      code: 'PLAYBACK_ERROR',
+      message: cause instanceof Error ? cause.message : String(cause),
+    },
+  };
 }

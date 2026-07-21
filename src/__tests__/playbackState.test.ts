@@ -1,6 +1,10 @@
 import { describe, expect, test } from 'bun:test';
 
-import { initialPlaybackState, reducePlaybackState } from '../playbackState';
+import {
+  createPlaybackErrorAction,
+  initialPlaybackState,
+  reducePlaybackState,
+} from '../playbackState';
 
 describe('playback state', () => {
   test('auto plays once after both resources become ready', () => {
@@ -55,6 +59,54 @@ describe('playback state', () => {
     });
 
     expect(staleError).toEqual(reset);
+  });
+
+  test('clears pending load and play effects when ignoring a stale event', () => {
+    const imageReady = reducePlaybackState(initialPlaybackState, {
+      type: 'imageReady',
+      version: 0,
+    });
+    const ready = reducePlaybackState(imageReady, {
+      type: 'videoReady',
+      version: 0,
+    });
+    const stale = reducePlaybackState(ready, {
+      type: 'ended',
+      version: -1,
+    });
+
+    expect(stale).toEqual({
+      ...ready,
+      command: null,
+      shouldNotifyLoad: false,
+    });
+  });
+
+  test('clears a pending error when ignoring a stale event', () => {
+    const failed = reducePlaybackState(initialPlaybackState, {
+      type: 'error',
+      version: 0,
+      error: { code: 'VIDEO_LOAD_ERROR', message: 'failed' },
+    });
+    const stale = reducePlaybackState(failed, {
+      type: 'videoReady',
+      version: -1,
+    });
+
+    expect(stale).toEqual({ ...failed, errorToReport: null });
+  });
+
+  test('ignores a reset error created for an older resource version', () => {
+    const firstReset = reducePlaybackState(initialPlaybackState, {
+      type: 'reset',
+    });
+    const resetError = createPlaybackErrorAction(
+      new Error('old reset failed'),
+      firstReset.version,
+    );
+    const secondReset = reducePlaybackState(firstReset, { type: 'reset' });
+
+    expect(reducePlaybackState(secondReset, resetError)).toEqual(secondReset);
   });
 
   test('reports an error code only once per resource version', () => {
