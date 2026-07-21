@@ -8,6 +8,17 @@ class ExpoMockLivePhotoModule : Module() {
     Name("ExpoMockLivePhoto")
 
     View(ExpoMockLivePhotoView::class) {
+      Events("onVideoReady", "onPlaybackStart", "onPlaybackEnd", "onError")
+
+      Prop("videoUri") { view: ExpoMockLivePhotoView, value: String -> view.setVideoUri(value) }
+      Prop("muted") { view: ExpoMockLivePhotoView, value: Boolean -> view.setMuted(value) }
+      Prop("resizeMode") { view: ExpoMockLivePhotoView, value: String -> view.setResizeMode(value) }
+
+      AsyncFunction("play") { view: ExpoMockLivePhotoView -> view.play() }
+      AsyncFunction("pause") { view: ExpoMockLivePhotoView -> view.pause() }
+      AsyncFunction("reset") { view: ExpoMockLivePhotoView -> view.reset() }
+
+      OnViewDestroys { view -> view.reset() }
     }
   }
 }
