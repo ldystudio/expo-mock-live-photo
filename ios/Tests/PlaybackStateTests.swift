@@ -35,12 +35,16 @@ final class PlaybackStateTests: XCTestCase {
     XCTAssertEqual(state.phase, .ended)
   }
 
-  func testResetIgnoresOldVersionEvents() {
+  func testResetIgnoresOldVersionEventsAndReplay() throws {
     var state = PlaybackState()
+    state.reduce(.ready(0))
+    state.reduce(.ended(0))
+    let token = try XCTUnwrap(state.requestReplay(version: 0))
     state.reduce(.reset)
     state.reduce(.ready(0))
     state.reduce(.ended(0))
     state.reduce(.failed(0))
+    XCTAssertFalse(state.consumeReplay(version: 0, token: token))
     XCTAssertEqual(state.phase, .idle)
     XCTAssertEqual(state.version, 1)
   }
