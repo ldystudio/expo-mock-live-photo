@@ -7,7 +7,6 @@
     "newArchEnabled": true,
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "expo.modules.mocklivephoto.example"
@@ -20,9 +19,6 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "package": "expo.modules.mocklivephoto.example"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
     },
     "plugins": [
       [
