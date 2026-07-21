@@ -14,7 +14,6 @@ import {
   initialPlaybackState,
   type PlaybackAction,
   reducePlaybackState,
-  shouldHandleAsyncResult,
 } from './playbackState';
 
 /** Displays an image-backed video that behaves like a Live Photo. */
@@ -59,7 +58,7 @@ export function MockLivePhoto({
     }
     if (next.command) {
       void nativeRef.current?.[next.command]().catch((cause: unknown) => {
-        if (!shouldHandleAsyncResult(mountedRef.current)) return;
+        if (!mountedRef.current) return;
         transition(createPlaybackErrorAction(cause, next.version));
       });
     }
@@ -84,7 +83,7 @@ export function MockLivePhoto({
     transition({ type: 'reset' });
     const resetVersion = stateRef.current.version;
     void nativeRef.current?.reset().catch((cause: unknown) => {
-      if (!shouldHandleAsyncResult(mountedRef.current)) return;
+      if (!mountedRef.current) return;
       transition(createPlaybackErrorAction(cause, resetVersion));
     });
   }, [sourceKey, transition, videoSource.uri]);

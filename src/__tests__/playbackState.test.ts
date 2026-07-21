@@ -4,7 +4,6 @@ import {
   createPlaybackErrorAction,
   initialPlaybackState,
   reducePlaybackState,
-  shouldHandleAsyncResult,
 } from '../playbackState';
 
 describe('playback state', () => {
@@ -173,11 +172,6 @@ describe('playback state', () => {
       command: 'play',
       showCover: true,
     });
-  });
-
-  test('ignores async results after unmount', () => {
-    expect(shouldHandleAsyncResult(false)).toBe(false);
-    expect(shouldHandleAsyncResult(true)).toBe(true);
   });
 
   test('does not auto play after a resource load error', () => {
