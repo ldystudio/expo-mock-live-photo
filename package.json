@@ -6,9 +6,13 @@
   "types": "build/index.d.ts",
   "packageManager": "bun@1.3.14",
   "files": [
-    "android",
+    "android/build.gradle",
+    "android/src/main",
     "build",
-    "ios",
+    "ios/ExpoMockLivePhoto.podspec",
+    "ios/ExpoMockLivePhotoModule.swift",
+    "ios/ExpoMockLivePhotoView.swift",
+    "ios/PlaybackState.swift",
     "src",
     "expo-module.config.json"
   ],
