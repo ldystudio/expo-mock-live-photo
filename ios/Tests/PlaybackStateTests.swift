@@ -13,12 +13,26 @@ final class PlaybackStateTests: XCTestCase {
     XCTAssertEqual(state.phase, .ended)
   }
 
-  func testPlayAfterEndStartsPlaybackAgain() {
+  func testPlayAfterEndStartsPlaybackAgain() throws {
     var state = PlaybackState()
     state.reduce(.ready(0))
     state.reduce(.ended(0))
+    let token = try XCTUnwrap(state.requestReplay(version: 0))
+    XCTAssertTrue(state.consumeReplay(version: 0, token: token))
     state.reduce(.started(0))
     XCTAssertEqual(state.phase, .playing)
+  }
+
+  func testPauseCancelsPendingReplay() throws {
+    var state = PlaybackState()
+    state.reduce(.ready(0))
+    state.reduce(.ended(0))
+    let oldToken = try XCTUnwrap(state.requestReplay(version: 0))
+    state.reduce(.pause)
+    let newToken = try XCTUnwrap(state.requestReplay(version: 0))
+    XCTAssertFalse(state.consumeReplay(version: 0, token: oldToken))
+    XCTAssertTrue(state.consumeReplay(version: 0, token: newToken))
+    XCTAssertEqual(state.phase, .ended)
   }
 
   func testResetIgnoresOldVersionEvents() {
@@ -27,6 +41,7 @@ final class PlaybackStateTests: XCTestCase {
     state.reduce(.ready(0))
     state.reduce(.ended(0))
     state.reduce(.failed(0))
-    XCTAssertEqual(state, PlaybackState(phase: .idle, version: 1))
+    XCTAssertEqual(state.phase, .idle)
+    XCTAssertEqual(state.version, 1)
   }
 }

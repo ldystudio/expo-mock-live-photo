@@ -11,6 +11,9 @@
       "**",
       "!!build",
       "!!node_modules",
+      "!!ios/.build",
+      "!!android/.gradle",
+      "!!android/build",
       "!!example/ios",
       "!!example/android"
     ]

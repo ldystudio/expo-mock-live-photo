@@ -75,8 +75,21 @@ final class ExpoMockLivePhotoView: ExpoView {
     playbackStartPending = true
     if state.phase == .ended {
       let version = state.version
+      guard let replayToken = state.requestReplay(version: version) else {
+        playbackStartPending = false
+        return
+      }
       player.seek(to: .zero) { [weak self] finished in
-        guard let self, finished, self.state.version == version else { return }
+        guard
+          let self,
+          self.playbackStartPending,
+          self.state.consumeReplay(version: version, token: replayToken)
+        else { return }
+        guard finished else {
+          self.playbackStartPending = false
+          self.onError(["code": "PLAYBACK_ERROR", "message": "Unable to restart video"])
+          return
+        }
         self.player.play()
       }
     } else {
