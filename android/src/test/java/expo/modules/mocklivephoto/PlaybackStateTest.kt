@@ -61,6 +61,20 @@ class PlaybackStateTest {
     assertEquals(1, state.version)
   }
 
+  @Test
+  fun detachReturnsToIdleWithoutChangingResourceVersion() {
+    val state = endedState()
+    state.requestReplay(0)
+
+    state.reduce(PlaybackState.Event.Detach)
+
+    assertEquals(PlaybackPhase.Idle, state.phase)
+    assertEquals(0, state.version)
+    assertEquals(null, state.completeReplaySeek())
+    state.reduce(PlaybackState.Event.Ready(0))
+    assertEquals(PlaybackPhase.Ready, state.phase)
+  }
+
   private fun endedState() = PlaybackState().apply {
     reduce(PlaybackState.Event.Ready(0))
     reduce(PlaybackState.Event.Ended(0))

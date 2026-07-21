@@ -94,9 +94,19 @@ class ExpoMockLivePhotoView(context: Context, appContext: AppContext) : ExpoView
     if (visibility != View.VISIBLE) pause()
   }
 
+  override fun onAttachedToWindow() {
+    super.onAttachedToWindow()
+    if (surface == null && textureView.isAvailable) {
+      textureView.surfaceTexture?.let { surface = Surface(it) }
+    }
+    createPlayerIfReady()
+  }
+
   override fun onDetachedFromWindow() {
-    textureView.surfaceTextureListener = null
-    reset()
+    pauseForDetach()
+    state.reduce(PlaybackState.Event.Detach)
+    playbackStartPending = false
+    releasePlayer(reportError = false)
     surface?.release()
     surface = null
     super.onDetachedFromWindow()
@@ -118,7 +128,8 @@ class ExpoMockLivePhotoView(context: Context, appContext: AppContext) : ExpoView
   }
 
   override fun onSurfaceTextureDestroyed(texture: SurfaceTexture): Boolean {
-    state.reduce(PlaybackState.Event.Reset)
+    pauseForDetach()
+    state.reduce(PlaybackState.Event.Detach)
     playbackStartPending = false
     releasePlayer(reportError = false)
     surface?.release()
@@ -129,6 +140,7 @@ class ExpoMockLivePhotoView(context: Context, appContext: AppContext) : ExpoView
   override fun onSurfaceTextureUpdated(texture: SurfaceTexture) = Unit
 
   private fun createPlayerIfReady() {
+    if (player != null) return
     val uri = videoUri ?: return
     val currentSurface = surface ?: return
     val version = state.version
@@ -209,10 +221,20 @@ class ExpoMockLivePhotoView(context: Context, appContext: AppContext) : ExpoView
   private fun fail(code: String, message: String, version: Int) {
     if (version != state.version) return
     val previous = state.phase
-    state.reduce(PlaybackState.Event.Failed(version))
     if (previous == PlaybackPhase.Failed) return
+    releasePlayer(reportError = false)
+    state.reduce(PlaybackState.Event.Failed(version))
     playbackStartPending = false
     onError(mapOf("code" to code, "message" to message))
+  }
+
+  private fun pauseForDetach() {
+    if (state.phase != PlaybackPhase.Playing) return
+    try {
+      player?.pause()
+    } catch (_: IllegalStateException) {
+    } catch (_: SecurityException) {
+    }
   }
 
   private fun performReplayAction(currentPlayer: MediaPlayer, action: ReplayAction) {

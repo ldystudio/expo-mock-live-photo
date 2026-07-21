@@ -17,6 +17,7 @@ internal sealed interface ReplayAction {
 internal class PlaybackState {
   sealed interface Event {
     data object Reset : Event
+    data object Detach : Event
     data class Ready(val version: Int) : Event
     data class Started(val version: Int) : Event
     data object Pause : Event
@@ -38,6 +39,10 @@ internal class PlaybackState {
     when (event) {
       Event.Reset -> {
         version += 1
+        phase = PlaybackPhase.Idle
+        clearReplays()
+      }
+      Event.Detach -> {
         phase = PlaybackPhase.Idle
         clearReplays()
       }
