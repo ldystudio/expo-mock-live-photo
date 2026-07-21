@@ -10,8 +10,8 @@ import {
   type MockLivePhotoNativeViewRef,
 } from './MockLivePhotoNativeView';
 import {
+  createInitialPlaybackState,
   createPlaybackErrorAction,
-  initialPlaybackState,
   type PlaybackAction,
   reducePlaybackState,
 } from './playbackState';
@@ -20,6 +20,7 @@ import {
 export function MockLivePhoto({
   source,
   videoSource,
+  autoPlay = true,
   muted = true,
   resizeMode = 'cover',
   onLoad,
@@ -30,7 +31,8 @@ export function MockLivePhoto({
 }: MockLivePhotoProps) {
   const nativeRef = useRef<MockLivePhotoNativeViewRef>(null);
   const mountedRef = useRef(true);
-  const stateRef = useRef(initialPlaybackState);
+  const initialState = useRef(createInitialPlaybackState(autoPlay)).current;
+  const stateRef = useRef(initialState);
   const callbacksRef = useRef({
     onLoad,
     onPlaybackStart,
@@ -40,7 +42,7 @@ export function MockLivePhoto({
   callbacksRef.current = { onLoad, onPlaybackStart, onPlaybackEnd, onError };
   const sourceKey = JSON.stringify(source);
   const previousResources = useRef({ sourceKey, videoUri: videoSource.uri });
-  const [state, setState] = useState(initialPlaybackState);
+  const [state, setState] = useState(initialState);
 
   const transition = useCallback((action: PlaybackAction) => {
     const next = reducePlaybackState(stateRef.current, action);
@@ -80,13 +82,13 @@ export function MockLivePhoto({
       return;
     }
     previousResources.current = { sourceKey, videoUri: videoSource.uri };
-    transition({ type: 'reset' });
+    transition({ type: 'reset', autoPlay });
     const resetVersion = stateRef.current.version;
     void nativeRef.current?.reset().catch((cause: unknown) => {
       if (!mountedRef.current) return;
       transition(createPlaybackErrorAction(cause, resetVersion));
     });
-  }, [sourceKey, transition, videoSource.uri]);
+  }, [autoPlay, sourceKey, transition, videoSource.uri]);
 
   const version = state.version;
   const reportError = (error: MockLivePhotoError) => {
@@ -132,10 +134,7 @@ export function MockLivePhoto({
         key={`image-${version}`}
         source={source}
         resizeMode={resizeMode}
-        style={[
-          StyleSheet.absoluteFillObject,
-          !state.showCover && styles.hidden,
-        ]}
+        style={[styles.cover, !state.showCover && styles.hidden]}
         onLoad={() => transition({ type: 'imageReady', version })}
         onError={({ nativeEvent }) =>
           reportError({
@@ -149,5 +148,9 @@ export function MockLivePhoto({
 }
 
 const styles = StyleSheet.create({
+  cover: {
+    width: '100%',
+    height: '100%',
+  },
   hidden: { opacity: 0 },
 });

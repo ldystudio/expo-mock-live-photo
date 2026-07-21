@@ -6,6 +6,7 @@ export type PlaybackCommand = 'play' | 'pause';
 
 export type PlaybackState = {
   version: number;
+  autoPlay: boolean;
   imageReady: boolean;
   videoReady: boolean;
   hasLoadError: boolean;
@@ -28,20 +29,25 @@ export type PlaybackAction =
   | ({ type: 'error'; error: MockLivePhotoError } & VersionedAction)
   | { type: 'paused' }
   | { type: 'press' }
-  | { type: 'reset' };
+  | { type: 'reset'; autoPlay?: boolean };
 
-export const initialPlaybackState: PlaybackState = {
-  version: 0,
-  imageReady: false,
-  videoReady: false,
-  hasLoadError: false,
-  status: 'loading',
-  showCover: true,
-  command: null,
-  shouldNotifyLoad: false,
-  errorToReport: null,
-  reportedErrorCodes: [],
-};
+export function createInitialPlaybackState(autoPlay = true): PlaybackState {
+  return {
+    version: 0,
+    autoPlay,
+    imageReady: false,
+    videoReady: false,
+    hasLoadError: false,
+    status: 'loading',
+    showCover: true,
+    command: null,
+    shouldNotifyLoad: false,
+    errorToReport: null,
+    reportedErrorCodes: [],
+  };
+}
+
+export const initialPlaybackState = createInitialPlaybackState();
 
 export function reducePlaybackState(
   state: PlaybackState,
@@ -75,7 +81,7 @@ export function reducePlaybackState(
         return {
           ...ready,
           status: 'ready',
-          command: 'play',
+          command: state.autoPlay ? 'play' : null,
           shouldNotifyLoad: true,
         };
       }
@@ -124,7 +130,7 @@ export function reducePlaybackState(
       };
     case 'reset':
       return {
-        ...initialPlaybackState,
+        ...createInitialPlaybackState(action.autoPlay ?? state.autoPlay),
         version: state.version + 1,
       };
   }

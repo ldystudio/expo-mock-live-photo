@@ -1,6 +1,6 @@
 # expo-mock-live-photo
 
-A React Native component that pairs a cover image with automatic first playback and tap controls.
+A React Native component that pairs a cover image with optional automatic first playback and tap controls.
 
 ## Requirements
 
@@ -29,6 +29,7 @@ export function Photo() {
     <MockLivePhoto
       source={require('./cover.jpg')}
       videoSource={{ uri: 'https://example.com/video.mp4' }}
+      autoPlay={false}
       style={{ width: 320, height: 320 }}
       onError={(error) => console.warn(error.code, error.message)}
     />
@@ -36,7 +37,7 @@ export function Photo() {
 }
 ```
 
-Each source pair automatically plays once after both resources are ready. Changing `source` or `videoSource` on the same component creates a new pair that automatically plays once. The cover image returns when the video ends naturally; after that, press anywhere on the component to play or pause.
+By default, each source pair automatically plays once after both resources are ready. Set `autoPlay={false}` to keep showing the cover until the user presses the component. Changing `source` or `videoSource.uri` creates a new resource version. Each version can auto-play once; changing only `autoPlay` does not start, pause, or reset the current version and is applied to the next resource version.
 
 ## Props
 
@@ -44,6 +45,7 @@ Each source pair automatically plays once after both resources are ready. Changi
 | --- | --- | --- | --- |
 | `source` | `ImageSourcePropType` | Required | Cover image displayed before and after playback. |
 | `videoSource` | `{ uri: string }` | Required | URI readable by the platform video player. |
+| `autoPlay` | `boolean` | `true` | Whether each new resource version plays automatically after both resources are ready. |
 | `muted` | `boolean` | `true` | Whether video audio is muted. |
 | `resizeMode` | `'cover' \| 'contain'` | `'cover'` | How the image and video fit their bounds. |
 | `onLoad` | `() => void` | - | Called once both resources are ready for each source pair. |

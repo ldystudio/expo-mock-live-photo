@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 
 import {
+  createInitialPlaybackState,
   createPlaybackErrorAction,
   initialPlaybackState,
   reducePlaybackState,
@@ -27,6 +28,54 @@ describe('playback state', () => {
     });
     expect(duplicate.command).toBeNull();
     expect(duplicate.shouldNotifyLoad).toBe(false);
+  });
+
+  test('waits for a press when auto play is disabled', () => {
+    const initial = createInitialPlaybackState(false);
+    const imageReady = reducePlaybackState(initial, {
+      type: 'imageReady',
+      version: 0,
+    });
+    const ready = reducePlaybackState(imageReady, {
+      type: 'videoReady',
+      version: 0,
+    });
+
+    expect(ready).toMatchObject({
+      status: 'ready',
+      command: null,
+      shouldNotifyLoad: true,
+      showCover: true,
+    });
+    expect(reducePlaybackState(ready, { type: 'press' }).command).toBe('play');
+  });
+
+  test('uses the auto play snapshot from each resource version', () => {
+    const disabled = reducePlaybackState(initialPlaybackState, {
+      type: 'reset',
+      autoPlay: false,
+    });
+    const disabledReady = reducePlaybackState(
+      reducePlaybackState(disabled, {
+        type: 'imageReady',
+        version: disabled.version,
+      }),
+      { type: 'videoReady', version: disabled.version },
+    );
+    expect(disabledReady.command).toBeNull();
+
+    const enabled = reducePlaybackState(disabledReady, {
+      type: 'reset',
+      autoPlay: true,
+    });
+    const enabledReady = reducePlaybackState(
+      reducePlaybackState(enabled, {
+        type: 'imageReady',
+        version: enabled.version,
+      }),
+      { type: 'videoReady', version: enabled.version },
+    );
+    expect(enabledReady.command).toBe('play');
   });
 
   test('keeps the cover hidden while playing or paused and restores it after ending', () => {

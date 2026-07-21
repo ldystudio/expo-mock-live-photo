@@ -22,12 +22,14 @@ final class ExpoMockLivePhotoView: ExpoView {
     super.init(appContext: appContext)
     clipsToBounds = true
     playerLayer.player = player
+    playerLayer.isHidden = true
     layer.addSublayer(playerLayer)
 
     timeControlObservation = player.observe(\.timeControlStatus, options: [.new]) { [weak self] player, _ in
       guard let self, player.timeControlStatus == .playing, self.playbackStartPending else { return }
       self.playbackStartPending = false
       self.state.reduce(.started(self.state.version))
+      self.playerLayer.isHidden = false
       self.onPlaybackStart([:])
     }
     backgroundNotification = NotificationCenter.default.addObserver(
@@ -121,6 +123,7 @@ final class ExpoMockLivePhotoView: ExpoView {
     itemNotifications.removeAll()
     player.pause()
     player.replaceCurrentItem(with: nil)
+    playerLayer.isHidden = true
   }
 
   private func observe(_ item: AVPlayerItem, version: Int) {
@@ -154,6 +157,7 @@ final class ExpoMockLivePhotoView: ExpoView {
         let previousPhase = self.state.phase
         self.state.reduce(.ended(version))
         if previousPhase != .ended, self.state.phase == .ended {
+          self.playerLayer.isHidden = true
           self.onPlaybackEnd([:])
         }
       },
@@ -172,6 +176,7 @@ final class ExpoMockLivePhotoView: ExpoView {
     guard previousPhase != .failed else { return }
     playbackStartPending = false
     player.pause()
+    playerLayer.isHidden = true
     onError(["code": code, "message": message])
   }
 

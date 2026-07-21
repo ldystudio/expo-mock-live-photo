@@ -10,6 +10,8 @@ const video = require('./assets/live-photo.mp4');
 
 export default function App() {
   const [assets, assetError] = useAssets(video);
+  const [autoPlay, setAutoPlay] = useState(true);
+  const [instanceKey, setInstanceKey] = useState(0);
   const [muted, setMuted] = useState(true);
   const [lastEvent, setLastEvent] = useState<LastEvent>('Loading');
 
@@ -18,6 +20,11 @@ export default function App() {
   }, [assetError]);
 
   const asset = assets?.[0];
+  const updateAutoPlay = (value: boolean) => {
+    setAutoPlay(value);
+    setInstanceKey((current) => current + 1);
+    setLastEvent('Loading');
+  };
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -29,8 +36,10 @@ export default function App() {
 
         {asset ? (
           <MockLivePhoto
+            key={instanceKey}
             source={cover}
             videoSource={{ uri: asset.localUri ?? asset.uri }}
+            autoPlay={autoPlay}
             muted={muted}
             style={styles.media}
             accessibilityLabel="Toggle live photo playback"
@@ -48,15 +57,27 @@ export default function App() {
             <Text style={styles.label}>Last event</Text>
             <Text style={styles.status}>{lastEvent}</Text>
           </View>
-          <View style={styles.mutedControl}>
-            <Text style={styles.label}>Muted</Text>
-            <Switch
-              accessibilityLabel="Mute video"
-              value={muted}
-              onValueChange={setMuted}
-              trackColor={{ false: '#a8ada8', true: '#27745a' }}
-              thumbColor="#ffffff"
-            />
+          <View style={styles.settings}>
+            <View style={styles.setting}>
+              <Text style={styles.label}>Auto play</Text>
+              <Switch
+                accessibilityLabel="Automatically play video"
+                value={autoPlay}
+                onValueChange={updateAutoPlay}
+                trackColor={{ false: '#a8ada8', true: '#27745a' }}
+                thumbColor="#ffffff"
+              />
+            </View>
+            <View style={styles.setting}>
+              <Text style={styles.label}>Muted</Text>
+              <Switch
+                accessibilityLabel="Mute video"
+                value={muted}
+                onValueChange={setMuted}
+                trackColor={{ false: '#a8ada8', true: '#27745a' }}
+                thumbColor="#ffffff"
+              />
+            </View>
           </View>
         </View>
       </View>
@@ -106,9 +127,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  mutedControl: {
+  settings: {
+    gap: 6,
+  },
+  setting: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-end',
     gap: 10,
   },
   label: {

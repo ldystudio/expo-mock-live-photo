@@ -20,6 +20,8 @@ export interface MockLivePhotoProps extends ViewProps {
   source: ImageSourcePropType;
   /** Video paired with the cover image. */
   videoSource: VideoSource;
+  /** Whether each new source pair plays automatically when ready. @default true */
+  autoPlay?: boolean;
   /** Whether video audio is muted. @default true */
   muted?: boolean;
   /** How the image and video fit their bounds. @default 'cover' */
