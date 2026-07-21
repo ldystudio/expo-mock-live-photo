@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const { spawnSyncWithAutoShell } = require('./util');
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const SUBTARGETS = ['plugin', 'cli', 'utils', 'scripts'];
 
@@ -17,7 +17,10 @@ run('tsc');
 // Clean and build any existing subtargets
 for (const target of SUBTARGETS) {
   const targetDir = path.join(process.cwd(), target);
-  if (fs.existsSync(targetDir) && fs.existsSync(path.join(targetDir, 'tsconfig.json'))) {
+  if (
+    fs.existsSync(targetDir) &&
+    fs.existsSync(path.join(targetDir, 'tsconfig.json'))
+  ) {
     console.log(`Building ${target}`);
     fs.rmSync(path.join(targetDir, 'build'), { recursive: true, force: true });
     run('tsc', ['--build', targetDir]);

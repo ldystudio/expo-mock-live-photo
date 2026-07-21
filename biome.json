@@ -8,12 +8,11 @@
   "files": {
     "ignoreUnknown": true,
     "includes": [
-      "src/**",
-      "example/App.tsx",
-      "biome.json",
-      "expo-module.config.json",
-      "package.json",
-      "tsconfig.json"
+      "**",
+      "!!build",
+      "!!node_modules",
+      "!!example/ios",
+      "!!example/android"
     ]
   },
   "formatter": {

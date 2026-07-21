@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-const { spawn } = require('child_process');
-const path = require('path');
+const { spawn } = require('node:child_process');
+const path = require('node:path');
 
 if (process.platform !== 'darwin') {
   console.error(
-    `Error: Xcode is only available on macOS. Cannot open the iOS project on ${process.platform}.`
+    `Error: Xcode is only available on macOS. Cannot open the iOS project on ${process.platform}.`,
   );
   process.exit(1);
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const { spawnSyncWithAutoShell } = require('./util');
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const SUBTARGETS = ['plugin', 'cli', 'utils', 'scripts'];
 const args = process.argv.slice(2);
@@ -11,7 +11,9 @@ let tscArgs;
 if (SUBTARGETS.includes(target)) {
   const targetDir = path.join(process.cwd(), target);
   if (!fs.existsSync(path.join(targetDir, 'tsconfig.json'))) {
-    console.log(`tsconfig.json not found in ${target}, skipping build for ${target}`);
+    console.log(
+      `tsconfig.json not found in ${target}, skipping build for ${target}`,
+    );
     process.exit(0);
   }
   tscArgs = ['--build', targetDir, ...args.slice(1)];

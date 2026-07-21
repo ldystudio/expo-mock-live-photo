@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-const { spawn, spawnSync } = require('child_process');
-const path = require('path');
-const fs = require('fs');
-const os = require('os');
+const { spawn, spawnSync } = require('node:child_process');
+const path = require('node:path');
+const fs = require('node:fs');
+const os = require('node:os');
 
 const projectPath = path.join(process.cwd(), 'example', 'android');
 
@@ -44,7 +44,7 @@ switch (process.platform) {
         console.error(
           `Error: Android Studio not found at ${studioSh}.\n` +
             `Check that the ANDROID_STUDIO environment variable points to your Android Studio installation directory, ` +
-            `or open the project manually in Android Studio: ${projectPath}`
+            `or open the project manually in Android Studio: ${projectPath}`,
         );
         process.exit(1);
       }
@@ -76,7 +76,9 @@ switch (process.platform) {
             ['which', bin],
             ['sh', '-c', `command -v ${bin}`],
           ]) {
-            const r = spawnSync(lookup[0], lookup.slice(1), { encoding: 'utf8' });
+            const r = spawnSync(lookup[0], lookup.slice(1), {
+              encoding: 'utf8',
+            });
             if (r.status === 0 && r.stdout.trim()) {
               studioSh = r.stdout.trim();
               break;
@@ -90,7 +92,7 @@ switch (process.platform) {
         console.error(
           `Error: Android Studio not found.\n` +
             `Set the ANDROID_STUDIO environment variable to your Android Studio installation directory, ` +
-            `or open the project manually in Android Studio: ${projectPath}`
+            `or open the project manually in Android Studio: ${projectPath}`,
         );
         process.exit(1);
       }
@@ -102,12 +104,19 @@ switch (process.platform) {
   case 'win32': {
     const studioExe = process.env.ANDROID_STUDIO
       ? path.join(process.env.ANDROID_STUDIO, 'bin', 'studio64.exe')
-      : path.join('C:', 'Program Files', 'Android', 'Android Studio', 'bin', 'studio64.exe');
-    if (!require('fs').existsSync(studioExe)) {
+      : path.join(
+          'C:',
+          'Program Files',
+          'Android',
+          'Android Studio',
+          'bin',
+          'studio64.exe',
+        );
+    if (!require('node:fs').existsSync(studioExe)) {
       console.error(
         `Error: Android Studio not found at ${studioExe}.\n` +
           `Set the ANDROID_STUDIO environment variable to your Android Studio installation directory, ` +
-          `or open the project manually in Android Studio: ${projectPath}`
+          `or open the project manually in Android Studio: ${projectPath}`,
       );
       process.exit(1);
     }
