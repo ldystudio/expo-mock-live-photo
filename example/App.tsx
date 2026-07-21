@@ -3,7 +3,7 @@ import { MockLivePhoto } from 'expo-mock-live-photo';
 import { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, Switch, Text, View } from 'react-native';
 
-type PlaybackStatus = 'Loading' | 'Ready' | 'Playing' | 'Ended' | 'Error';
+type LastEvent = 'Loading' | 'Ready' | 'Started' | 'Ended' | 'Error';
 
 const cover = require('./assets/cover.jpg');
 const video = require('./assets/live-photo.mp4');
@@ -11,10 +11,10 @@ const video = require('./assets/live-photo.mp4');
 export default function App() {
   const [assets, assetError] = useAssets(video);
   const [muted, setMuted] = useState(true);
-  const [status, setStatus] = useState<PlaybackStatus>('Loading');
+  const [lastEvent, setLastEvent] = useState<LastEvent>('Loading');
 
   useEffect(() => {
-    if (assetError) setStatus('Error');
+    if (assetError) setLastEvent('Error');
   }, [assetError]);
 
   const asset = assets?.[0];
@@ -33,11 +33,11 @@ export default function App() {
             videoSource={{ uri: asset.localUri ?? asset.uri }}
             muted={muted}
             style={styles.media}
-            accessibilityLabel="Play live photo"
-            onLoad={() => setStatus('Ready')}
-            onPlaybackStart={() => setStatus('Playing')}
-            onPlaybackEnd={() => setStatus('Ended')}
-            onError={() => setStatus('Error')}
+            accessibilityLabel="Toggle live photo playback"
+            onLoad={() => setLastEvent('Ready')}
+            onPlaybackStart={() => setLastEvent('Started')}
+            onPlaybackEnd={() => setLastEvent('Ended')}
+            onError={() => setLastEvent('Error')}
           />
         ) : (
           <View style={styles.media} />
@@ -45,8 +45,8 @@ export default function App() {
 
         <View style={styles.controls}>
           <View>
-            <Text style={styles.label}>Playback</Text>
-            <Text style={styles.status}>{status}</Text>
+            <Text style={styles.label}>Last event</Text>
+            <Text style={styles.status}>{lastEvent}</Text>
           </View>
           <View style={styles.mutedControl}>
             <Text style={styles.label}>Muted</Text>
