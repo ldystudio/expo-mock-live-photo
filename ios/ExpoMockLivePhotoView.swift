@@ -5,6 +5,7 @@ import UIKit
 final class ExpoMockLivePhotoView: ExpoView {
   let onVideoReady = EventDispatcher()
   let onPlaybackStart = EventDispatcher()
+  let onPlaybackPause = EventDispatcher()
   let onPlaybackEnd = EventDispatcher()
   let onError = EventDispatcher()
 
@@ -34,7 +35,7 @@ final class ExpoMockLivePhotoView: ExpoView {
       object: nil,
       queue: .main
     ) { [weak self] _ in
-      self?.pause()
+      self?.pauseForLifecycle()
     }
   }
 
@@ -101,6 +102,14 @@ final class ExpoMockLivePhotoView: ExpoView {
     playbackStartPending = false
     player.pause()
     state.reduce(.pause)
+  }
+
+  private func pauseForLifecycle() {
+    playbackStartPending = false
+    player.pause()
+    if state.reduce(.lifecyclePause) {
+      onPlaybackPause([:])
+    }
   }
 
   func reset() {

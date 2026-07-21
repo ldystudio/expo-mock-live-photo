@@ -5,7 +5,7 @@ public class ExpoMockLivePhotoModule: Module {
     Name("ExpoMockLivePhoto")
 
     View(ExpoMockLivePhotoView.self) {
-      Events("onVideoReady", "onPlaybackStart", "onPlaybackEnd", "onError")
+      Events("onVideoReady", "onPlaybackStart", "onPlaybackPause", "onPlaybackEnd", "onError")
 
       Prop("videoUri") { (view, value: String) in
         view.setVideoUri(value)

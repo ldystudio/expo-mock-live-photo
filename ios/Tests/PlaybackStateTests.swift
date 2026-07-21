@@ -13,6 +13,15 @@ final class PlaybackStateTests: XCTestCase {
     XCTAssertEqual(state.phase, .ended)
   }
 
+  func testLifecyclePauseOnlyNotifiesWhenPlaying() {
+    var state = PlaybackState()
+    state.reduce(.ready(0))
+    state.reduce(.started(0))
+    XCTAssertTrue(state.reduce(.lifecyclePause))
+    XCTAssertEqual(state.phase, .paused)
+    XCTAssertFalse(state.reduce(.lifecyclePause))
+  }
+
   func testPlayAfterEndStartsPlaybackAgain() throws {
     var state = PlaybackState()
     state.reduce(.ready(0))

@@ -13,6 +13,7 @@ struct PlaybackState: Equatable {
     case ready(Int)
     case started(Int)
     case pause
+    case lifecyclePause
     case ended(Int)
     case failed(Int)
   }
@@ -22,7 +23,8 @@ struct PlaybackState: Equatable {
   private var nextReplayToken = 0
   private var pendingReplayToken: Int?
 
-  mutating func reduce(_ event: Event) {
+  @discardableResult
+  mutating func reduce(_ event: Event) -> Bool {
     switch event {
     case .reset:
       version += 1
@@ -39,6 +41,12 @@ struct PlaybackState: Equatable {
       if phase == .playing {
         phase = .paused
       }
+    case .lifecyclePause:
+      pendingReplayToken = nil
+      if phase == .playing {
+        phase = .paused
+        return true
+      }
     case .ended(let eventVersion) where eventVersion == version && phase != .failed:
       phase = .ended
       pendingReplayToken = nil
@@ -48,6 +56,7 @@ struct PlaybackState: Equatable {
     default:
       break
     }
+    return false
   }
 
   mutating func requestReplay(version eventVersion: Int) -> Int? {
