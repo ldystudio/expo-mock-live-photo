@@ -1,0 +1,10 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "expo-mock-live-photo": ["../src/index"],
+      "expo-mock-live-photo/*": ["../src/*"]
+    }
+  }
+}

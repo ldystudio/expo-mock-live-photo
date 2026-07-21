@@ -1,0 +1,9 @@
+{
+  "platforms": ["android", "apple"],
+  "apple": {
+    "modules": ["ExpoMockLivePhotoModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.mocklivephoto.ExpoMockLivePhotoModule"]
+  }
+}

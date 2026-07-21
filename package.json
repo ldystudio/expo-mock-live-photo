@@ -1,0 +1,46 @@
+{
+  "name": "expo-mock-live-photo",
+  "version": "0.1.0",
+  "description": "Simulate Live Photo playback from an image and a video",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "build": "expo-module build",
+    "check": "biome check .",
+    "format": "biome format --write .",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "prepare": "node internal/module_scripts/prepare.js",
+    "open:ios": "node internal/module_scripts/open-ios.js",
+    "open:android": "node internal/module_scripts/open-android.js"
+  },
+  "keywords": [
+    "react-native",
+    "expo",
+    "expo-mock-live-photo",
+    "ExpoMockLivePhoto"
+  ],
+  "repository": "https://github.com/ldystudio/expo-mock-live-photo",
+  "bugs": {
+    "url": "https://github.com/ldystudio/expo-mock-live-photo/issues"
+  },
+  "author": "Liudy <1187551003@qq.com> (https://github.com/ldystudio)",
+  "license": "MIT",
+  "homepage": "https://github.com/ldystudio/expo-mock-live-photo#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@biomejs/biome": "latest",
+    "@types/react": "~19.1.1",
+    "babel-preset-expo": "~55.0.8",
+    "expo": "^57.0.7",
+    "expo-module-scripts": "^56.0.3",
+    "react-native": "0.82.1",
+    "typescript": "^5.9.2"
+  },
+  "peerDependencies": {
+    "expo": "*",
+    "react": "*",
+    "react-native": ">=0.75.5"
+  }
+}
