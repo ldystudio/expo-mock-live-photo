@@ -1,6 +1,6 @@
 # expo-mock-live-photo
 
-A React Native component that pairs a cover image with press-to-play video playback.
+A React Native component that pairs a cover image with automatic first playback and tap controls.
 
 ## Requirements
 
@@ -36,7 +36,7 @@ export function Photo() {
 }
 ```
 
-Press the component to start playback. The cover image is shown before playback and after the video ends.
+Each component instance automatically plays once after both resources are ready. The cover image returns when the video ends naturally; after that, press anywhere on the component to play or pause.
 
 ## Props
 
@@ -47,7 +47,7 @@ Press the component to start playback. The cover image is shown before playback 
 | `muted` | `boolean` | `true` | Whether video audio is muted. |
 | `resizeMode` | `'cover' \| 'contain'` | `'cover'` | How the image and video fit their bounds. |
 | `onLoad` | `() => void` | - | Called once both resources are ready for each source pair. |
-| `onPlaybackStart` | `() => void` | - | Called whenever the video actually enters the playing state. |
+| `onPlaybackStart` | `() => void` | - | Called when automatic playback, resumed playback, or replay after an end actually enters the playing state. |
 | `onPlaybackEnd` | `() => void` | - | Called when the video reaches its natural end. |
 | `onError` | `(error: { code: string; message: string }) => void` | - | Called once per error code for each source pair. Errors are also reported with `console.error`; they are not thrown. |
 | React Native `ViewProps` | `ViewProps` | - | Standard view props, including `style`, accessibility, and test props. |
