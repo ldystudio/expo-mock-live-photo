@@ -8,7 +8,6 @@
   "files": [
     "android/build.gradle",
     "android/src/main",
-    "assets/live-photo.png",
     "build",
     "ios/ExpoMockLivePhoto.podspec",
     "ios/ExpoMockLivePhotoModule.swift",
@@ -17,7 +16,7 @@
     "expo-module.config.json"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf build && tsc",
     "check": "biome check .",
     "format": "biome format --write .",
     "test": "bun test",
@@ -34,24 +33,23 @@
   ],
   "author": "Liudy <1187551003@qq.com> (https://github.com/ldystudio)",
   "license": "MIT",
+  "homepage": "https://github.com/ldystudio/expo-mock-live-photo",
   "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@biomejs/biome": "2.5.5",
     "@types/bun": "^1.3.14",
-    "@types/react": "~18.3.12",
-    "babel-preset-expo": "~12.0.11",
-    "expo": "~52.0.49",
-    "expo-blur": "~14.0.3",
-    "expo-module-scripts": "~4.0.5",
-    "react": "18.3.1",
-    "react-native": "0.76.9",
+    "@types/react": "~18.2.79",
+    "babel-preset-expo": "~11.0.15",
+    "expo": "~51.0.39",
+    "expo-module-scripts": "~3.5.4",
+    "react": "18.2.0",
+    "react-native": "0.74.5",
     "typescript": "~5.3.3"
   },
   "peerDependencies": {
     "expo": "*",
-    "expo-blur": "*",
     "react": "*",
-    "react-native": ">=0.75.5"
+    "react-native": ">=0.74.5"
   }
 }

@@ -3,8 +3,6 @@
     "name": "expo-mock-live-photo-example",
     "slug": "expo-mock-live-photo-example",
     "version": "1.0.0",
-    "jsEngine": "hermes",
-    "newArchEnabled": true,
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "ios": {
@@ -24,8 +22,11 @@
       [
         "expo-build-properties",
         {
+          "android": {
+            "newArchEnabled": true
+          },
           "ios": {
-            "deploymentTarget": "16.4"
+            "newArchEnabled": true
           }
         }
       ]

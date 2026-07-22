@@ -13,7 +13,6 @@ export default function App() {
   const [autoPlay, setAutoPlay] = useState(true);
   const [instanceKey, setInstanceKey] = useState(0);
   const [muted, setMuted] = useState(true);
-  const [showLivePhotoBadge, setShowLivePhotoBadge] = useState(true);
   const [lastEvent, setLastEvent] = useState<LastEvent>('Loading');
 
   useEffect(() => {
@@ -41,7 +40,6 @@ export default function App() {
             source={cover}
             videoSource={{ uri: asset.localUri ?? asset.uri }}
             autoPlay={autoPlay}
-            showLivePhotoBadge={showLivePhotoBadge}
             muted={muted}
             style={styles.media}
             accessibilityLabel="Toggle live photo playback"
@@ -60,16 +58,6 @@ export default function App() {
             <Text style={styles.status}>{lastEvent}</Text>
           </View>
           <View style={styles.settings}>
-            <View style={styles.setting}>
-              <Text style={styles.label}>Live badge</Text>
-              <Switch
-                accessibilityLabel="Show Live Photo badge"
-                value={showLivePhotoBadge}
-                onValueChange={setShowLivePhotoBadge}
-                trackColor={{ false: '#a8ada8', true: '#27745a' }}
-                thumbColor="#ffffff"
-              />
-            </View>
             <View style={styles.setting}>
               <Text style={styles.label}>Auto play</Text>
               <Switch

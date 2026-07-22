@@ -22,10 +22,6 @@ export interface MockLivePhotoProps extends ViewProps {
   videoSource: VideoSource;
   /** Whether each new source pair plays automatically when ready. @default true */
   autoPlay?: boolean;
-  /** Whether the Live Photo badge is displayed. @default true */
-  showLivePhotoBadge?: boolean;
-  /** Tint color of the Live Photo badge. @default '#ffffff' */
-  livePhotoBadgeColor?: string;
   /** Whether video audio is muted. @default true */
   muted?: boolean;
   /** How the image and video fit their bounds. @default 'cover' */

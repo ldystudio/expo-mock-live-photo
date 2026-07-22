@@ -1,19 +1,17 @@
-package_root = File.expand_path('..', __dir__)
-local_package_url = "file://#{package_root}"
+require "json"
+
+package = JSON.parse(File.read(File.join(__dir__, '..', 'package.json')))
 
 Pod::Spec.new do |s|
   s.name           = 'ExpoMockLivePhoto'
-  s.version        = '0.1.0'
-  s.summary        = 'Simulate Live Photo playback from an image and a video.'
-  s.description    = 'Simulate Live Photo playback from an image and a video.'
-  s.author         = { 'Liudy' => '1187551003@qq.com' }
+  s.version        = package['version']
+  s.summary        = package['description']
+  s.description    = package['description']
+  s.author         = package['author']
   s.license        = { type: 'MIT', file: '../LICENSE' }
-  s.homepage       = local_package_url
-  s.platforms      = {
-    :ios => '16.4',
-    :tvos => '16.4'
-  }
-  s.source         = { git: local_package_url }
+  s.homepage       = package['homepage']
+  s.platforms      = { :ios => '13.4' }
+  s.source         = { git: "https://github.com/ldystudio/expo-mock-live-photo" }
   s.static_framework = true
 
   s.dependency 'ExpoModulesCore'

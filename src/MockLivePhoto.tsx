@@ -1,4 +1,3 @@
-import { BlurView } from 'expo-blur';
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { Image, Pressable, StyleSheet } from 'react-native';
 
@@ -22,8 +21,6 @@ export function MockLivePhoto({
   source,
   videoSource,
   autoPlay = true,
-  showLivePhotoBadge = true,
-  livePhotoBadgeColor = '#ffffff',
   muted = true,
   resizeMode = 'cover',
   onLoad,
@@ -146,45 +143,11 @@ export function MockLivePhoto({
           })
         }
       />
-      {showLivePhotoBadge && (
-        <BlurView
-          accessible={false}
-          importantForAccessibility="no-hide-descendants"
-          pointerEvents="none"
-          tint="dark"
-          intensity={35}
-          experimentalBlurMethod="dimezisBlurView"
-          style={styles.badge}
-        >
-          <Image
-            accessible={false}
-            source={require('../assets/live-photo.png')}
-            style={[styles.badgeIcon, { tintColor: livePhotoBadgeColor }]}
-          />
-        </BlurView>
-      )}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  badge: {
-    position: 'absolute',
-    top: 12,
-    left: 12,
-    zIndex: 1,
-    width: 32,
-    height: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 16,
-    overflow: 'hidden',
-    backgroundColor: 'rgba(0, 0, 0, 0.18)',
-  },
-  badgeIcon: {
-    width: 22,
-    height: 22,
-  },
   cover: {
     width: '100%',
     height: '100%',
