@@ -15,6 +15,7 @@ Expo Go does not include this native module. Use a development build.
 
 ```bash
 bun add expo-mock-live-photo
+bun expo install expo-blur
 ```
 
 Bare React Native apps must first [install and configure Expo Modules](https://docs.expo.dev/bare/installing-expo-modules/). On iOS, install pods after adding the package.
@@ -30,6 +31,7 @@ export function Photo() {
       source={require('./cover.jpg')}
       videoSource={{ uri: 'https://example.com/video.mp4' }}
       autoPlay={false}
+      livePhotoBadgeColor="#ffffff"
       style={{ width: 320, height: 320 }}
       onError={(error) => console.warn(error.code, error.message)}
     />
@@ -46,6 +48,8 @@ By default, each source pair automatically plays once after both resources are r
 | `source` | `ImageSourcePropType` | Required | Cover image displayed before and after playback. |
 | `videoSource` | `{ uri: string }` | Required | URI readable by the platform video player. |
 | `autoPlay` | `boolean` | `true` | Whether each new resource version plays automatically after both resources are ready. |
+| `showLivePhotoBadge` | `boolean` | `true` | Whether the Live Photo badge is displayed in the top-left corner. |
+| `livePhotoBadgeColor` | `string` | `'#ffffff'` | Tint color of the Live Photo badge. |
 | `muted` | `boolean` | `true` | Whether video audio is muted. |
 | `resizeMode` | `'cover' \| 'contain'` | `'cover'` | How the image and video fit their bounds. |
 | `onLoad` | `() => void` | - | Called once both resources are ready for each source pair. |
