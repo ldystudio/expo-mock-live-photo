@@ -4,7 +4,7 @@ A React Native component that pairs a cover image with optional automatic first 
 
 ## Requirements
 
-- React Native 0.75.5 or newer
+- React Native 0.74.5 or newer
 - Expo Modules in an Expo development build or a bare React Native app
 - iOS 13.4 or newer
 - Android API 24 or newer

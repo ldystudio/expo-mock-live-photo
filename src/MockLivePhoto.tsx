@@ -1,5 +1,5 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
-import { Image, Pressable, StyleSheet } from 'react-native';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 
 import type {
   MockLivePhotoError,
@@ -27,6 +27,7 @@ export function MockLivePhoto({
   onPlaybackStart,
   onPlaybackEnd,
   onError,
+  children,
   ...viewProps
 }: MockLivePhotoProps) {
   const nativeRef = useRef<MockLivePhotoNativeViewRef>(null);
@@ -143,6 +144,11 @@ export function MockLivePhoto({
           })
         }
       />
+      {children ? (
+        <View pointerEvents="box-none" style={StyleSheet.absoluteFillObject}>
+          {children}
+        </View>
+      ) : null}
     </Pressable>
   );
 }
